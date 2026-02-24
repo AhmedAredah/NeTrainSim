@@ -7,7 +7,7 @@ set(RABBITMQ_CONFIG_SOURCES
     RabbitMQConfigDialog.cpp
 )
 
-add_executable(NeTrainSimRabbitMQConfig ${RABBITMQ_CONFIG_SOURCES})
+add_executable(NeTrainSimRabbitMQConfig ${RABBITMQ_CONFIG_SOURCES} resources.qrc)
 
 target_link_libraries(NeTrainSimRabbitMQConfig
     PRIVATE
