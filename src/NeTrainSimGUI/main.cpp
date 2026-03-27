@@ -1,12 +1,14 @@
 #include "gui/netrainsimmainwindow.h"
 
 #include <QApplication>
+#include <QIcon>
 #include <QLocale>
 #include <QTranslator>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":/resources/icon.png"));
 
     // Parse the command-line arguments
     QCommandLineParser parser;

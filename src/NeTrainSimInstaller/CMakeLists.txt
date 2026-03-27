@@ -495,7 +495,7 @@ ${_DIRS_ARGS}            )
                         continue()
                     endif()
                     execute_process(
-                        COMMAND \"${PATCHELF_EXECUTABLE}\" --set-rpath \\$ORIGIN \"\${_lib}\"
+                        COMMAND \"${PATCHELF_EXECUTABLE}\" --force-rpath --set-rpath \\$ORIGIN \"\${_lib}\"
                         ERROR_QUIET)
                 endforeach()
             " COMPONENT NeTrainSimGUI_COMP)
@@ -532,7 +532,7 @@ ${_DIRS_ARGS}            )
                         continue()
                     endif()
                     execute_process(
-                        COMMAND \"${PATCHELF_EXECUTABLE}\" --set-rpath \\$ORIGIN \"\${_lib}\"
+                        COMMAND \"${PATCHELF_EXECUTABLE}\" --force-rpath --set-rpath \\$ORIGIN \"\${_lib}\"
                         ERROR_QUIET)
                 endforeach()
             " COMPONENT NeTrainSimServer_COMP)
@@ -658,7 +658,7 @@ ${_DIRS_ARGS}                )
                     continue()
                 endif()
                 execute_process(
-                    COMMAND \"${PATCHELF_EXECUTABLE}\" --set-rpath \\$ORIGIN \"\${_lib}\"
+                    COMMAND \"${PATCHELF_EXECUTABLE}\" --force-rpath --set-rpath \\$ORIGIN \"\${_lib}\"
                     ERROR_QUIET)
             endforeach()
 
@@ -666,7 +666,18 @@ ${_DIRS_ARGS}                )
             file(GLOB_RECURSE _qt_plugins \"\${CMAKE_INSTALL_PREFIX}/plugins/*.so\")
             foreach(_plugin \${_qt_plugins})
                 execute_process(
-                    COMMAND \"${PATCHELF_EXECUTABLE}\" --set-rpath \\$ORIGIN/../../lib \"\${_plugin}\"
+                    COMMAND \"${PATCHELF_EXECUTABLE}\" --force-rpath --set-rpath \\$ORIGIN/../../lib \"\${_plugin}\"
+                    ERROR_QUIET)
+            endforeach()
+
+            # Fix RPATH on executables in bin/
+            file(GLOB _all_bins \"\${CMAKE_INSTALL_PREFIX}/bin/*\")
+            foreach(_bin \${_all_bins})
+                if(IS_SYMLINK \"\${_bin}\" OR IS_DIRECTORY \"\${_bin}\")
+                    continue()
+                endif()
+                execute_process(
+                    COMMAND \"${PATCHELF_EXECUTABLE}\" --force-rpath --set-rpath \\$ORIGIN/../lib:\\$ORIGIN \"\${_bin}\"
                     ERROR_QUIET)
             endforeach()
         " COMPONENT NeTrainSimCore_COMP)
@@ -704,6 +715,14 @@ install(
     PATTERN "*.dat"
     PATTERN "*.NTS"
     PATTERN "*.nts"
+)
+
+# Install shared icon for desktop entries and application use
+install(
+    FILES ${CMAKE_SOURCE_DIR}/src/resources/icon.png
+    DESTINATION data
+    RENAME NeTrainSim.png
+    COMPONENT NeTrainSimCore_COMP
 )
 
 # ========================================
@@ -752,6 +771,7 @@ if(WIN32)
     set(CPACK_IFW_PACKAGE_NAME "NeTrainSim")
     set(CPACK_IFW_PACKAGE_VERSION "${NeTrainSim_VERSION_MAJOR}.${NeTrainSim_VERSION_MINOR}.${NeTrainSim_VERSION_PATCH}")
     set(CPACK_IFW_PACKAGE_MAINTENANCE_TOOL_NAME "NeTrainSimMaintenanceTool")
+    set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/src/resources/icon.ico")
 
     if(BUILD_GUI)
         set(CPACK_IFW_PACKAGE_RUN_PROGRAM "@TargetDir@/bin/NeTrainSimGUI.exe")
@@ -1133,6 +1153,8 @@ elseif(UNIX AND NOT APPLE)
     set(CPACK_IFW_PACKAGE_NAME "NeTrainSim")
     set(CPACK_IFW_PACKAGE_VERSION "${NeTrainSim_VERSION_MAJOR}.${NeTrainSim_VERSION_MINOR}.${NeTrainSim_VERSION_PATCH}")
     set(CPACK_IFW_PACKAGE_MAINTENANCE_TOOL_NAME "NeTrainSimMaintenanceTool")
+    set(CPACK_IFW_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/src/resources/icon.png")
+    set(CPACK_IFW_PACKAGE_WINDOW_ICON "${CMAKE_SOURCE_DIR}/src/resources/icon.png")
     # Linux-specific: default install to home directory
     set(CPACK_IFW_PACKAGE_TARGET_DIR "@HomeDir@/NeTrainSim")
 
@@ -1172,7 +1194,8 @@ Component.prototype.createOperations = function() {
                 'NeTrainSim.desktop',
                 'Version=1.0\\nType=Application\\nTerminal=true\\n' +
                 'Exec=@TargetDir@/bin/NeTrainSim\\n' +
-                'Name=NeTrainSim\\nCategories=Education;Science;\\n' +
+                'Name=NeTrainSim\\nIcon=@TargetDir@/data/NeTrainSim.png\\n' +
+                'Categories=Education;Science;\\n' +
                 'Comment=Network Train Simulator');
 
             // Make executables executable
@@ -1199,7 +1222,8 @@ Component.prototype.createOperations = function() {
                 'NeTrainSimConsole.desktop',
                 'Version=1.0\\nType=Application\\nTerminal=true\\n' +
                 'Exec=@TargetDir@/bin/NeTrainSim\\n' +
-                'Name=NeTrainSim Console\\nCategories=Education;Science;\\n' +
+                'Name=NeTrainSim Console\\nIcon=@TargetDir@/data/NeTrainSim.png\\n' +
+                'Categories=Education;Science;\\n' +
                 'Comment=NeTrainSim Console Application');
 
             component.addOperation('Execute', 'chmod', '+x',
@@ -1226,7 +1250,8 @@ Component.prototype.createOperations = function() {
                 'NeTrainSimGUI.desktop',
                 'Version=1.0\\nType=Application\\nTerminal=false\\n' +
                 'Exec=@TargetDir@/bin/NeTrainSimGUI\\n' +
-                'Name=NeTrainSim GUI\\nCategories=Education;Science;\\n' +
+                'Name=NeTrainSim GUI\\nIcon=@TargetDir@/data/NeTrainSim.png\\n' +
+                'Categories=Education;Science;\\n' +
                 'Comment=NeTrainSim GUI Application');
 
             component.addOperation('Execute', 'chmod', '+x',
@@ -1254,7 +1279,8 @@ Component.prototype.createOperations = function() {
                 'NeTrainSimServer.desktop',
                 'Version=1.0\\nType=Application\\nTerminal=true\\n' +
                 'Exec=@TargetDir@/bin/NeTrainSimServer\\n' +
-                'Name=NeTrainSim Server\\nCategories=Education;Science;\\n' +
+                'Name=NeTrainSim Server\\nIcon=@TargetDir@/data/NeTrainSim.png\\n' +
+                'Categories=Education;Science;\\n' +
                 'Comment=NeTrainSim Server Application');
 
             component.addOperation('Execute', 'chmod', '+x',

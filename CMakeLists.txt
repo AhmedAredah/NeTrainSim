@@ -11,6 +11,9 @@ if(UNIX AND NOT APPLE)
     # $ORIGIN: shared libs in lib/ find peer libs in same directory
     set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib;$ORIGIN")
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+    # Force DT_RPATH (inherited, searched before system) instead of
+    # DT_RUNPATH (non-inherited) for portable installs
+    add_link_options("-Wl,--disable-new-dtags")
 else()
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif()
