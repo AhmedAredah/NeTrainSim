@@ -50,7 +50,7 @@ static std::atomic<int> trainID{
 Vector<Map<std::string, std::any>> NETRAINSIMCORE_EXPORT
 readTrainsFile(const std::string &fileName);
 
-static void NETRAINSIMCORE_EXPORT resetTrainID()
+static void resetTrainID()
 {
     trainID.store(
         0, std::memory_order_release); // Ensure visibility
