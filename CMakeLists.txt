@@ -144,7 +144,7 @@ endif()
 
 if(BUILD_GUI)
     if(WIN32)
-        set(KDREPORTS_DIR "C:/Program Files/KDAB/KDReports/cmake" CACHE PATH "Path to KDReports CMake directory")
+        set(KDREPORTS_DIR "C:/KDAB/KDReports-2.3.95/lib/cmake/KDReports-qt6" CACHE PATH "Path to KDReports CMake directory")
     elseif(APPLE)
         set(KDREPORTS_DIR "/usr/local/KDAB/KDReports-2.3.95/lib/cmake/KDReports-qt6" CACHE PATH "Path to KDReports CMake directory")
     elseif(UNIX)
@@ -158,7 +158,7 @@ endif()
 if(BUILD_SERVER)
     if(WIN32)
         # Windows-specific paths
-        set(CONTAINER_SEARCH_PATHS "C:/Program Files/Container/cmake" CACHE PATH "Default path to container's library")
+        set(CONTAINER_SEARCH_PATHS "C:/Program Files/ContainerLib/lib/cmake/Container" CACHE PATH "Default path to container's library")
         set(RABBITMQ_CMAKE_DIR "C:/Program Files/rabbitmq-c/lib/cmake/rabbitmq-c" CACHE PATH "Default path to RabbitMQ-C library on Windows")
     elseif(APPLE)
         # macOS-specific paths
