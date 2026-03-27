@@ -42,7 +42,7 @@ void SimulatorWorker::setupSimulator(
         auto slinkRecords = convertToStdVector(linkRecords);
         auto trainsRecords = Utils::convertToStdVector(trainsList);
 
-        qInfo() << "Reading Network: " << networkName.toStdString()
+        qInfo() << "Reading Network: " << qUtf8Printable(networkName)
                 << "!                    \r";
         auto nodes = ReadWriteNetwork::generateNodes(snodeRecords);
         auto links = ReadWriteNetwork::generateLinks(nodes, slinkRecords);
@@ -51,7 +51,7 @@ void SimulatorWorker::setupSimulator(
         auto trainsq = Utils::convertToQVector(trains);
 
         qInfo() << "Define Simulator Space for network: "
-                << networkName.toStdString()
+                << qUtf8Printable(networkName)
                 << "!                          \r";
 
         apiData.network = new Network(nodes, links, networkName.toStdString());
