@@ -102,6 +102,7 @@ void SimulationServer::loadRabbitMQConfig()
     }
 
     QDomDocument doc;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     auto         result = doc.setContent(&file);
     file.close();
 
@@ -112,6 +113,20 @@ void SimulationServer::loadRabbitMQConfig()
                    << result.errorLine;
         return;
     }
+#else
+    QString errorMsg;
+    int     errorLine = 0;
+    bool    result = doc.setContent(&file, &errorMsg, &errorLine);
+    file.close();
+
+    if (!result)
+    {
+        qWarning() << "Failed to parse RabbitMQ config XML:"
+                   << errorMsg << "at line"
+                   << errorLine;
+        return;
+    }
+#endif
 
     QDomElement root = doc.documentElement();
     if (root.tagName() != "rabbitmq")
