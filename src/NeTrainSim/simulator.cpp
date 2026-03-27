@@ -6,6 +6,11 @@
 #include "simulator.h"
 #include "network/netsignalgroupcontroller.h" // Include for controlling network signal groups
 #include "network/netsignalgroupcontrollerwithqueuing.h"
+#ifdef Q_OS_WIN
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 #include <chrono>    // Include for time-related operations
 #include <ctime>
 #include <locale>
@@ -648,6 +653,7 @@ void Simulator::playTrainOneTimeStep(std::shared_ptr <Train> train)
                         train->forceTrainToStopFor(nextStopNode->dwellTimeIfTerminal,
                                                    this->simulationTime);
 
+#ifdef BUILD_SERVER_ENABLED
                         /// handle when the port is saved by
                         /// either the port number of the port desc
                         QString portName =
@@ -658,17 +664,11 @@ void Simulator::playTrainOneTimeStep(std::shared_ptr <Train> train)
                         auto containerCount =
                             train->countContainersLeavingAtPort({portName,
                                                                  portDesc});
-                        // auto containers =
-                        //     train->getContainersLeavingAtPort({portName,
-                        //                                        portDesc});
-                        // QJsonArray containersJson;
-                        // for (const auto& container : containers) {
-                        //     containersJson.append(container->toJson());
-                        // }
                         emit trainReachedTerminal(
                             QString::fromStdString(train->trainUserID),
                             containerCount.first,
                             containerCount.second);
+#endif
                     }
                     // Skip movement if we're still within the dwell time
                     if (train->getRemainingDwellTime(this->simulationTime) > 0) {

@@ -685,8 +685,10 @@ public: signals:
 
     void errorOccurred(QString error);
 
+#ifdef BUILD_SERVER_ENABLED
     void trainReachedTerminal(QString trainID, QString terminalID,
                               int containersCount);
+#endif
 
     void simulationReachedReportingTime(
         double simulationTime,
