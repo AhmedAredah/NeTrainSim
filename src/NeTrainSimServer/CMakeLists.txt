@@ -53,6 +53,7 @@ target_link_libraries(${NETRAINSIM_SERVER_NAME} PRIVATE
 # Include Container library
 target_include_directories(${NETRAINSIM_CORE_NAME} PRIVATE ${CONTAINER_INCLUDE_DIRS})
 target_compile_definitions(${NETRAINSIM_CORE_NAME} PRIVATE BUILD_SERVER_ENABLED)
+target_compile_definitions(${NETRAINSIM_SERVER_NAME} PRIVATE BUILD_SERVER_ENABLED)
 
 # Conditionally link Qt6Keychain if available for secure password storage
 if(Qt6Keychain_FOUND)
@@ -93,35 +94,13 @@ add_custom_command(TARGET ${NETRAINSIM_SERVER_NAME} POST_BUILD
         $<TARGET_FILE:Container::Container> $<TARGET_FILE_DIR:${NETRAINSIM_SERVER_NAME}>  # Copy container.dll
 )
 
-# Ensure the NeTrainSim DLL is copied to the output directory
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    if(WIN32)
-        # Copy Windows DLLs in Release mode
-        add_custom_command(TARGET ${NETRAINSIM_SERVER_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${CONTAINER_BIN_DIR}/container.dll"
-                "$<TARGET_FILE_DIR:${NETRAINSIM_SERVER_NAME}>/container.dll"
-        )
-        add_custom_command(TARGET ${NETRAINSIM_SERVER_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${RABBITMQ_BIN_DIR}/rabbitmq.4.dll"
-                "$<TARGET_FILE_DIR:${NETRAINSIM_SERVER_NAME}>/rabbitmq.4.dll"
-        )
-    endif()
-elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(WIN32)
-        # Copy Windows debug DLLs
-        add_custom_command(TARGET ${NETRAINSIM_SERVER_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${CONTAINER_BIN_DIR}/containerd.dll"
-                "$<TARGET_FILE_DIR:${NETRAINSIM_SERVER_NAME}>/containerd.dll"
-        )
-        add_custom_command(TARGET ${NETRAINSIM_SERVER_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${RABBITMQ_BIN_DIR}/rabbitmq.4.dll"
-                "$<TARGET_FILE_DIR:${NETRAINSIM_SERVER_NAME}>/rabbitmq.4.dll"
-        )
-    endif()
+# Copy RabbitMQ DLL to the output directory
+if(WIN32 AND DEFINED RABBITMQ_SHRD_LIB_DIR)
+    add_custom_command(TARGET ${NETRAINSIM_SERVER_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${RABBITMQ_SHRD_LIB_DIR}/rabbitmq.4.dll"
+            "$<TARGET_FILE_DIR:${NETRAINSIM_SERVER_NAME}>/rabbitmq.4.dll"
+    )
 endif()
 
 
