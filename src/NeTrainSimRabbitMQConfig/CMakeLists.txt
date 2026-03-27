@@ -9,6 +9,10 @@ set(RABBITMQ_CONFIG_SOURCES
 
 add_executable(NeTrainSimRabbitMQConfig ${RABBITMQ_CONFIG_SOURCES} resources.qrc)
 
+if(WIN32)
+    set_target_properties(NeTrainSimRabbitMQConfig PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
 target_link_libraries(NeTrainSimRabbitMQConfig
     PRIVATE
     Qt6::Core

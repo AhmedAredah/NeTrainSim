@@ -243,26 +243,24 @@ if(WIN32)
     endforeach()
 
     # ========================================
-    # KDReports DLL (if BUILD_GUI)
+    # KDReports DLL (if BUILD_GUI and shared library)
     # ========================================
     if(BUILD_GUI)
         if(DEFINED KDREPORTS_DIR)
-            if(EXISTS "${KDREPORTS_DIR}/../bin/KDReports.dll")
-                install(FILES "${KDREPORTS_DIR}/../bin/KDReports.dll"
+            # Search for KDReports DLL in common locations relative to KDREPORTS_DIR
+            file(GLOB KDREPORTS_DLLS
+                "${KDREPORTS_DIR}/../bin/KDReports*.dll"
+                "${KDREPORTS_DIR}/../../../bin/KDReports*.dll"
+                "${KDREPORTS_DIR}/../../../bin/kdreports*.dll"
+            )
+            if(KDREPORTS_DLLS)
+                filter_debug_dlls(KDREPORTS_DLLS FILTERED_KDREPORTS_DLLS)
+                install(FILES ${FILTERED_KDREPORTS_DLLS}
                     DESTINATION bin
                     COMPONENT NeTrainSimGUI_COMP)
-                message(STATUS "Found KDReports.dll at: ${KDREPORTS_DIR}/../bin/KDReports.dll")
+                message(STATUS "Found KDReports DLLs: ${FILTERED_KDREPORTS_DLLS}")
             else()
-                # Try alternate known paths
-                file(GLOB KDREPORTS_DLLS "${KDREPORTS_DIR}/../../../bin/KDReports*.dll")
-                if(KDREPORTS_DLLS)
-                    filter_debug_dlls(KDREPORTS_DLLS FILTERED_KDREPORTS_DLLS)
-                    install(FILES ${FILTERED_KDREPORTS_DLLS}
-                        DESTINATION bin
-                        COMPONENT NeTrainSimGUI_COMP)
-                else()
-                    message(WARNING "KDReports.dll not found. Please verify KDREPORTS_DIR.")
-                endif()
+                message(STATUS "KDReports DLL not found - assuming static library (no DLL bundling needed).")
             endif()
         endif()
     endif()
