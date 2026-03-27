@@ -737,6 +737,7 @@ protected:
     QVector<std::shared_ptr<Train>>
     getAllTrains(QString networkName);
 
+#ifdef BUILD_SERVER_ENABLED
     /**
      * @brief Add containers to a specific train.
      * @param networkName Name of the network containing the
@@ -772,6 +773,7 @@ protected:
     void requestUnloadContainersAtTerminal(
         QString networkName, QString trainID,
         QVector<QString> portNames);
+#endif
 
 protected slots:
 
@@ -1220,10 +1222,12 @@ public:
          *
          * @return true if containers were successfully
          */
+#ifdef BUILD_SERVER_ENABLED
         static bool
         addContainersToTrain(QString     networkName,
                              QString     trainID,
                              QJsonObject json);
+#endif
 
         /**
          * @brief Get all trains in the specified network.
@@ -1236,6 +1240,7 @@ public:
         static QVector<std::shared_ptr<Train>>
         getTrains(QString networkName);
 
+#ifdef BUILD_SERVER_ENABLED
         /**
          * @brief Request a train to unload containers at a
          * specific terminal.
@@ -1250,6 +1255,7 @@ public:
         static void requestUnloadContainersAtTerminal(
             QString networkName, QString trainID,
             QVector<QString> portNames);
+#endif
     };
 
     /**
@@ -1446,10 +1452,12 @@ public:
          *
          * @return true if containers were successfully
          */
+#ifdef BUILD_SERVER_ENABLED
         static bool
         addContainersToTrain(QString     networkName,
                              QString     trainID,
                              QJsonObject json);
+#endif
 
         /**
          * @brief Get all trains in the specified network.
@@ -1462,6 +1470,7 @@ public:
         static QVector<std::shared_ptr<Train>>
         getTrains(QString networkName);
 
+#ifdef BUILD_SERVER_ENABLED
         /**
          * @brief Request a train to unload containers at a
          * specific terminal.
@@ -1476,6 +1485,7 @@ public:
         static void requestUnloadContainersAtTerminal(
             QString networkName, QString trainID,
             QVector<QString> terminalNames);
+#endif
     };
 
 private:

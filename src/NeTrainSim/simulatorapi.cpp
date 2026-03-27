@@ -1,6 +1,7 @@
 #include "simulatorapi.h"
 #include "./traindefinition/trainslist.h"
 #include <QDebug> // For debugging
+#include <QEventLoop>
 #include <QMetaObject> // Required for QMetaObject::invokeMethod and Q_ARG
 #include <QThread>
 #include <QThread>  // Required for QThread
@@ -585,6 +586,7 @@ void SimulatorAPI::setupConnections(
         },
         Qt::QueuedConnection));
 
+#ifdef BUILD_SERVER_ENABLED
     CHECK_TRUE(connect(
         simulator, &Simulator::trainReachedTerminal, this,
         [this, networkName](QString trainID,
@@ -594,6 +596,7 @@ void SimulatorAPI::setupConnections(
                                       terminalID,
                                       containersCount);
         }));
+#endif
 
     setupTrainsConnection(apiData.trains.values(),
                           networkName, mode);
@@ -1159,6 +1162,7 @@ SimulatorAPI::getAllTrains(QString networkName)
     return apiData.trains.values().toVector();
 }
 
+#ifdef BUILD_SERVER_ENABLED
 bool SimulatorAPI::addContainersToTrain(QString networkName,
                                         QString trainID,
                                         QJsonObject json)
@@ -1176,6 +1180,7 @@ bool SimulatorAPI::addContainersToTrain(QString networkName,
     }
     return result;
 }
+#endif
 
 void SimulatorAPI::requestRunSimulation(
     QVector<QString> networkNames, double timeSteps,
@@ -1273,6 +1278,7 @@ void SimulatorAPI::requestFinalizeSimulation(
     }
 }
 
+#ifdef BUILD_SERVER_ENABLED
 void SimulatorAPI::requestUnloadContainersAtTerminal(
     QString networkName, QString trainID,
     QVector<QString> portNames)
@@ -1303,6 +1309,7 @@ void SimulatorAPI::requestUnloadContainersAtTerminal(
     emit errorOccurred("A train with ID " + trainID
                        + " does not exist!");
 }
+#endif
 
 void SimulatorAPI::checkAndEmitSignal(
     const int &counter, const int total,
@@ -1453,12 +1460,14 @@ SimulatorAPI::InteractiveMode::getAllTrains(
     return getInstance().getAllTrains(networkName);
 }
 
+#ifdef BUILD_SERVER_ENABLED
 bool SimulatorAPI::InteractiveMode::addContainersToTrain(
     QString networkName, QString trainID, QJsonObject json)
 {
     return getInstance().addContainersToTrain(
         networkName, trainID, json);
 }
+#endif
 
 QVector<std::shared_ptr<Train>>
 SimulatorAPI::InteractiveMode::getTrains(
@@ -1467,6 +1476,7 @@ SimulatorAPI::InteractiveMode::getTrains(
     return getInstance().getAllTrains(networkName);
 }
 
+#ifdef BUILD_SERVER_ENABLED
 void SimulatorAPI::InteractiveMode::
     requestUnloadContainersAtTerminal(
         QString networkName, QString trainID,
@@ -1475,6 +1485,7 @@ void SimulatorAPI::InteractiveMode::
     getInstance().requestUnloadContainersAtTerminal(
         networkName, trainID, portNames);
 }
+#endif
 
 // -----------------------------------------------------------------------------
 // ----------------------------- Continuous Mode
@@ -1573,12 +1584,14 @@ Network *SimulatorAPI::ContinuousMode::getNetwork(
     return getInstance().getNetwork(networkName);
 }
 
+#ifdef BUILD_SERVER_ENABLED
 bool SimulatorAPI::ContinuousMode::addContainersToTrain(
     QString networkName, QString trainID, QJsonObject json)
 {
     return getInstance().addContainersToTrain(
         networkName, trainID, json);
 }
+#endif
 
 QVector<std::shared_ptr<Train>>
 SimulatorAPI::ContinuousMode::getTrains(QString networkName)
@@ -1586,6 +1599,7 @@ SimulatorAPI::ContinuousMode::getTrains(QString networkName)
     return getInstance().getAllTrains(networkName);
 }
 
+#ifdef BUILD_SERVER_ENABLED
 void SimulatorAPI::ContinuousMode::
     requestUnloadContainersAtTerminal(
         QString networkName, QString shipID,
@@ -1594,3 +1608,4 @@ void SimulatorAPI::ContinuousMode::
     getInstance().requestUnloadContainersAtTerminal(
         networkName, shipID, portNames);
 }
+#endif
