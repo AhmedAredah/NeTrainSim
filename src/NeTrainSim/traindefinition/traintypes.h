@@ -559,6 +559,20 @@ namespace TrainTypes {
         }
     }
 
+    /**
+     * *********************************************************************
+     * Brake Shoe Types
+     * *********************************************************************
+     */
+    /** Values that represent brake shoe types */
+    enum class _BrakeShoeType {
+        castIron,
+        composition
+    };
+
+    /** Type of the brake shoe */
+    using BrakeShoeType = _BrakeShoeType;
+
 }
 
 #endif // !carLocTypes_enum
