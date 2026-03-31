@@ -23,7 +23,6 @@ Train::Train(
     double trainStartTime_sec, double frictionCoeff,
     Vector<std::shared_ptr<Locomotive>> locomotives,
     Vector<std::shared_ptr<Car>> cars, bool optimize,
-    double desiredDecelerationRate_mPs,
     double operatorReactionTime_s, bool stopIfNoEnergy,
     double maxAllowedJerk_mPcs, double optimization_k,
     int runOptimizationEvery,
@@ -31,7 +30,7 @@ Train::Train(
     : QObject(nullptr)
 {
 
-    this->d_des = desiredDecelerationRate_mPs;
+    this->brakedWeightRatio = DefaultBrakedWeightRatio;
     this->operatorReactionTime = operatorReactionTime_s;
     this->stopTrainIfNoEnergy  = stopIfNoEnergy;
     this->maxJerk              = maxAllowedJerk_mPcs;
@@ -171,6 +170,43 @@ int Train::getActiveLocomotivesNumber()
 double Train::getMinFollowingTrainGap()
 {
     return DefaultMinFollowingGap;
+}
+
+void Train::setBrakedWeightRatio(double ratio)
+{
+    this->brakedWeightRatio = ratio;
+}
+
+double Train::getAverageTrainGrade()
+{
+    if (this->trainVehicles.empty())
+    {
+        return 0.0;
+    }
+    double sumGrade = 0.0;
+    for (auto &vehicle : this->trainVehicles)
+    {
+        sumGrade += vehicle->trackGrade;
+    }
+    return sumGrade / static_cast<double>(this->trainVehicles.size());
+}
+
+double Train::getDesiredDeceleration(double speed)
+{
+    double muShoe = EC::getBrakeShoeFriction(speed);
+
+    // Brake deceleration: lambda * g * mu_shoe(v)
+    double d_brake = this->brakedWeightRatio * this->g * muShoe;
+
+    // Grade contribution: positive grade (uphill) assists braking
+    double avgGrade = this->getAverageTrainGrade();
+    double d_grade = this->g * avgGrade;
+
+    double d = d_brake + d_grade;
+
+    // Clamp between minimum and wheel-rail adhesion limit
+    double d_max = this->coefficientOfFriction * this->g;
+    return std::max(MinDesiredDeceleration, std::min(d, d_max));
 }
 
 double Train::getBatteryEnergyConsumed()
@@ -640,15 +676,17 @@ double Train::getSafeGap(double initialGap, double speed,
     double gap_lad = 0;
     if (!estimate)
     {
+        double d = this->getDesiredDeceleration(speed);
         gap_lad = initialGap + T_s * speed
                   + (Utils::power(speed, 2)
-                     / (2.0 * this->d_des));
+                     / (2.0 * d));
     }
     else
     {
+        double d = this->getDesiredDeceleration(freeFlowSpeed);
         gap_lad = initialGap + T_s * freeFlowSpeed
                   + (Utils::power(freeFlowSpeed, 2)
-                     / (2.0 * this->d_des));
+                     / (2.0 * d));
     };
     return gap_lad;
 }
@@ -778,11 +816,12 @@ double Train::get_acceleration_an2(
     double gap, double minGap, double speed,
     double leaderSpeed, double T_s, double frictionCoef)
 {
+    double d = this->getDesiredDeceleration(speed);
     double term = 0.0;
     term        = Utils::power(Utils::power(speed, 2)
                                    - Utils::power(leaderSpeed, 2),
                                2)
-           / (4.0 * this->d_des);
+           / (4.0 * d);
     term =
         term / Utils::power(max((gap - minGap), 0.0001), 2);
     return min(term, frictionCoef * this->g);

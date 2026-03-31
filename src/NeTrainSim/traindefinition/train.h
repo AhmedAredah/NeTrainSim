@@ -53,8 +53,10 @@ class NETRAINSIMCORE_EXPORT Train : public QObject {
 private:
     /** Holds the number of trains in the simulator. */
     static unsigned int NumberOfTrainsInSimulator;
-    /** (Immutable) the default desired deceleration rate */
-    static constexpr double DefaultDesiredDecelerationRate = 0.2;
+    /** (Immutable) the default braked weight ratio (UIC lambda) for freight trains */
+    static constexpr double DefaultBrakedWeightRatio = 0.8;
+    /** (Immutable) minimum desired deceleration to prevent infinite safe gaps (m/s^2) */
+    static constexpr double MinDesiredDeceleration = 0.05;
     /** (Immutable) the default reaction time of the train operator */
     static constexpr double DefaultOperatorReactionTime = 1.0;
     /** (Immutable) the default switch of the train behaviour if no energy source */
@@ -77,8 +79,8 @@ public:
     static constexpr double speedOfSound = 343.0;
     /** (Immutable) gravitational acceleration */
     const double g = 9.8066;
-    /** The desired decceleration value */
-    double d_des;
+    /** The braked weight ratio (UIC lambda). Ratio of braked weight to total weight (0.5-1.0). */
+    double brakedWeightRatio = 0.8;
     /** the perception reaction time of the train operator. */
     double operatorReactionTime;
     /** Total length of the train */
@@ -273,15 +275,12 @@ public:
      * @param 	locomotives				   	The locomotives.
      * @param 	cars					   	The cars.
      * @param 	optimize				   	True to optimize.
-     * @param 	desiredDecelerationRate_mPs	(Optional) The desired deceleration rate m ps.
      * @param 	operatorReactionTime_s	   	(Optional) The operator reaction time s.
      * @param 	stopIfNoEnergy			   	(Optional) True to stop if no energy.
-     * @param 	isRunnigOffGrid			   	(Optional) True if is runnig off grid, false if not.
      * @param 	maxAllowedJerk_mPcs		   	(Optional) The maximum allowed jerk m pcs.
      */
     Train(int simulatorID, string id, Vector<int> trainPath, double trainStartTime_sec, double frictionCoeff,
           Vector<std::shared_ptr<Locomotive>> locomotives, Vector<std::shared_ptr<Car>> cars, bool optimize,
-          double desiredDecelerationRate_mPs = DefaultDesiredDecelerationRate,
           double operatorReactionTime_s = DefaultOperatorReactionTime,
           bool stopIfNoEnergy = DefaultStopIfNoEnergy,
           double maxAllowedJerk_mPcs = DefaultMaxAllowedJerk,
@@ -343,6 +342,30 @@ public:
      * @returns	The minimum following train gap.
      */
     double getMinFollowingTrainGap();
+
+    /**
+     * @brief Sets the braked weight ratio (UIC lambda).
+     * @param ratio The braked weight ratio (0.5 to 1.0).
+     */
+    void setBrakedWeightRatio(double ratio);
+
+    /**
+     * @brief Gets the speed-dependent desired deceleration rate.
+     *
+     * @details Uses the ETCS-validated model:
+     *   d(v, grade) = lambda * g * mu_shoe(v) + g * grade
+     * where mu_shoe(v) is the Karwatzki brake shoe friction coefficient.
+     *
+     * @param speed The current train speed in m/s.
+     * @returns The desired deceleration in m/s^2.
+     */
+    double getDesiredDeceleration(double speed);
+
+    /**
+     * @brief Gets the average track grade across all train vehicles.
+     * @returns The average track grade as a decimal (e.g., 0.02 for 2%).
+     */
+    double getAverageTrainGrade();
 
     /**
      * @brief set the current links the train is spanning
