@@ -541,12 +541,16 @@ double Locomotive::getEnergyConsumption(double& LocomotiveVirtualTractivePower,
 		return EC;
 	}
     else {
-        // get regenerative eff
+        // Blended braking: only the dynamic portion (motor as generator) is recoverable.
+        // Friction braking energy is dissipated as heat.
+        double recoverablePower =
+            -this->getRecoverableBrakingPower(tractivePower, trainSpeed);
+
         double regenerativeEff =
             this->getRegenerativeEffeciency(tractivePower,
                                             trainAcceleration, trainSpeed);
 
-        return ((tractivePower * regenerativeEff + this->auxiliaryPower) *
+        return ((recoverablePower * regenerativeEff + this->auxiliaryPower) *
                 EC::getDriveLineEff(trainSpeed,
                                     this->currentLocNotch,
                                     std::abs(powerPortion),
@@ -554,7 +558,7 @@ double Locomotive::getEnergyConsumption(double& LocomotiveVirtualTractivePower,
                                     this->hybridMethod) *
                 unitConversionFactor);
 
-	}
+    }
 }
 
 double Locomotive::getUsedPowerPortion(double trainSpeed,
@@ -566,6 +570,25 @@ double Locomotive::getUsedPowerPortion(double trainSpeed,
     // it is limited because at the begining of the deceleration, the
     // power is very high
     return std::min((LocomotiveVirtualTractivePower) / maxPower, 1.0);
+}
+
+double Locomotive::getRecoverableBrakingPower(double totalBrakingPower,
+                                              double trainSpeed)
+{
+    if (!TrainTypes::locomotiveRechargableTechnologies.exist(this->powerType)) {
+        return 0.0;
+    }
+
+    // Motor's max dynamic braking power is approximately its rated traction power
+    double maxDynamicPower = this->maxPower * 1000.0; // kW to W
+
+    // Dynamic braking fades linearly below 15 km/h (motor can't generate
+    // sufficient back-EMF at very low speeds)
+    double v_kmh = trainSpeed * 3.6;
+    double fadeFactor = std::min(v_kmh / EC::DynamicBrakingFadeSpeed_kmh, 1.0);
+    maxDynamicPower *= fadeFactor;
+
+    return std::min(std::abs(totalBrakingPower), maxDynamicPower);
 }
 
 double Locomotive::getMaxRechargeEnergy(double timeStep, double trainSpeed,
