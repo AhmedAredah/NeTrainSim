@@ -53,8 +53,6 @@ class NETRAINSIMCORE_EXPORT Train : public QObject {
 private:
     /** Holds the number of trains in the simulator. */
     static unsigned int NumberOfTrainsInSimulator;
-    /** (Immutable) the default braked weight ratio (UIC lambda) for freight trains */
-    static constexpr double DefaultBrakedWeightRatio = 0.8;
     /** (Immutable) minimum desired deceleration to prevent infinite safe gaps (m/s^2) */
     static constexpr double MinDesiredDeceleration = 0.05;
     /** (Immutable) the default reaction time of the train operator */
@@ -79,8 +77,6 @@ public:
     static constexpr double speedOfSound = 343.0;
     /** (Immutable) gravitational acceleration */
     const double g = 9.8066;
-    /** The braked weight ratio (UIC lambda). Ratio of braked weight to total weight (0.5-1.0). */
-    double brakedWeightRatio = 0.8;
     /** the perception reaction time of the train operator. */
     double operatorReactionTime;
     /** Total length of the train */
@@ -344,28 +340,16 @@ public:
     double getMinFollowingTrainGap();
 
     /**
-     * @brief Sets the braked weight ratio (UIC lambda).
-     * @param ratio The braked weight ratio (0.5 to 1.0).
-     */
-    void setBrakedWeightRatio(double ratio);
-
-    /**
      * @brief Gets the speed-dependent desired deceleration rate.
      *
-     * @details Uses the ETCS-validated model:
-     *   d(v, grade) = lambda * g * mu_shoe(v) + g * grade
-     * where mu_shoe(v) is the Karwatzki brake shoe friction coefficient.
+     * @details Sums per-vehicle braking forces (Karwatzki model) and divides
+     * by total train mass. Each vehicle uses its own brakedWeightRatio and
+     * trackGrade.
      *
      * @param speed The current train speed in m/s.
      * @returns The desired deceleration in m/s^2.
      */
     double getDesiredDeceleration(double speed);
-
-    /**
-     * @brief Gets the average track grade across all train vehicles.
-     * @returns The average track grade as a decimal (e.g., 0.02 for 2%).
-     */
-    double getAverageTrainGrade();
 
     /**
      * @brief set the current links the train is spanning

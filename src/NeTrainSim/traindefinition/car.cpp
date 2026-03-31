@@ -76,6 +76,12 @@ Car::Car(double carLength_m, double carDragCoef,
 
     } // end else if
 
+    if (this->carType == TrainTypes::CarType::cargo) {
+        this->brakedWeightRatio = EC::DefaultCarBrakedWeightRatio_Cargo;
+    } else {
+        this->brakedWeightRatio = EC::DefaultCarBrakedWeightRatio_Tender;
+    }
+
     this->hostLink = std::shared_ptr<NetLink>(); // assign empty placeholder
     this->trackCurvature = 0; // zero initialized
     this->trackGrade = 0;   // zero initialized

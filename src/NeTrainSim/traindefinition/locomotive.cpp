@@ -216,7 +216,9 @@ Locomotive::Locomotive(double locomotiveMaxPower_kw,
         this->hybridMethod = TrainTypes::LocomotivePowerMethod::notApplicable;
     }
 
-};	
+    this->brakedWeightRatio = EC::DefaultLocomotiveBrakedWeightRatio;
+
+};
 
 
 double Locomotive::getHyperbolicThrottleCoef(double & trainSpeed)

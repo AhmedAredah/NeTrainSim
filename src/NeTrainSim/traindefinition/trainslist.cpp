@@ -276,13 +276,6 @@ std::shared_ptr<Train> TrainsList::generateTrain(
                 trainRecord["Optimize"])
         );
 
-        // set braked weight ratio if provided
-        if (trainRecord.count("BrakedWeightRatio") > 0) {
-            train->setBrakedWeightRatio(
-                std::any_cast<double>(
-                    trainRecord["BrakedWeightRatio"]));
-        }
-
         return train;
     }
     catch (std::exception &e)
@@ -496,12 +489,6 @@ TrainsList::readTrainsFromJSON(
             {"Locomotives", locomotiveRecords},
             {"Cars", carRecords},
             {"Optimize", trainObject["Optimize"].toBool()}};
-
-        // add optional braked weight ratio
-        if (trainObject.contains("BrakedWeightRatio")) {
-            trainRecord["BrakedWeightRatio"] =
-                trainObject["BrakedWeightRatio"].toDouble();
-        }
 
         // Add the train record to the list
         trainsRecords.push_back(trainRecord);

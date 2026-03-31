@@ -47,6 +47,8 @@ public:
 	int noOfAxiles;
 	/** Auxiliary power */
 	double auxiliaryPower;
+	/** The braked weight ratio for this vehicle (UIC lambda). Set by subclass constructors. */
+	double brakedWeightRatio = 0.8;
 
     /** The amount of energy consumed in kwh*/
 	double energyConsumed = 0.0;
@@ -91,6 +93,17 @@ public:
 	 * @returns	The resistance.
 	 */
 	virtual double getResistance(double trainSpeed);
+
+	/**
+	 * \brief Gets the braking force for this vehicle at the given speed.
+	 *
+	 * \details Computes per-vehicle braking force using the Karwatzki model:
+	 *   F = brakedWeightRatio * weight * g * mu_shoe(v) + weight * g * grade
+	 *
+	 * @param trainSpeed The current train speed in m/s.
+	 * @returns The braking force in Newtons.
+	 */
+	virtual double getBrakingForce(double trainSpeed);
 
 	/**
 	 * \brief Resets the energy consumptions data for the current time step

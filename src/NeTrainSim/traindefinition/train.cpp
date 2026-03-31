@@ -30,7 +30,6 @@ Train::Train(
     : QObject(nullptr)
 {
 
-    this->brakedWeightRatio = DefaultBrakedWeightRatio;
     this->operatorReactionTime = operatorReactionTime_s;
     this->stopTrainIfNoEnergy  = stopIfNoEnergy;
     this->maxJerk              = maxAllowedJerk_mPcs;
@@ -172,39 +171,14 @@ double Train::getMinFollowingTrainGap()
     return DefaultMinFollowingGap;
 }
 
-void Train::setBrakedWeightRatio(double ratio)
-{
-    this->brakedWeightRatio = ratio;
-}
-
-double Train::getAverageTrainGrade()
-{
-    if (this->trainVehicles.empty())
-    {
-        return 0.0;
-    }
-    double sumGrade = 0.0;
-    for (auto &vehicle : this->trainVehicles)
-    {
-        sumGrade += vehicle->trackGrade;
-    }
-    return sumGrade / static_cast<double>(this->trainVehicles.size());
-}
-
 double Train::getDesiredDeceleration(double speed)
 {
-    double muShoe = EC::getBrakeShoeFriction(speed);
-
-    // Brake deceleration: lambda * g * mu_shoe(v)
-    double d_brake = this->brakedWeightRatio * this->g * muShoe;
-
-    // Grade contribution: positive grade (uphill) assists braking
-    double avgGrade = this->getAverageTrainGrade();
-    double d_grade = this->g * avgGrade;
-
-    double d = d_brake + d_grade;
-
-    // Clamp between minimum and wheel-rail adhesion limit
+    double totalBrakingForce = 0.0;
+    for (auto &vehicle : this->trainVehicles)
+    {
+        totalBrakingForce += vehicle->getBrakingForce(speed);
+    }
+    double d = totalBrakingForce / this->totalMass;
     double d_max = this->coefficientOfFriction * this->g;
     return std::max(MinDesiredDeceleration, std::min(d, d_max));
 }

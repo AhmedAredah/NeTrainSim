@@ -302,6 +302,15 @@ namespace EC {
      */
     double getFuelConversionFactor(TrainTypes::CarType carType);
 
+    /** (Immutable) gravitational acceleration (m/s^2) */
+    static constexpr double g = 9.8066;
+    /** (Immutable) default braked weight ratio for locomotives */
+    static constexpr double DefaultLocomotiveBrakedWeightRatio = 0.9;
+    /** (Immutable) default braked weight ratio for cargo cars */
+    static constexpr double DefaultCarBrakedWeightRatio_Cargo = 0.6;
+    /** (Immutable) default braked weight ratio for tender cars */
+    static constexpr double DefaultCarBrakedWeightRatio_Tender = 0.7;
+
     /** (Immutable) the speed below which dynamic braking fades to zero (km/h) */
     static constexpr double DynamicBrakingFadeSpeed_kmh = 15.0;
 
