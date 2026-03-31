@@ -301,6 +301,25 @@ namespace EC {
      * @returns The fuel conversion factor.
      */
     double getFuelConversionFactor(TrainTypes::CarType carType);
+
+    /** (Immutable) the speed below which dynamic braking fades to zero (km/h) */
+    static constexpr double DynamicBrakingFadeSpeed_kmh = 15.0;
+
+    /**
+     * Gets the brake shoe friction coefficient using the Karwatzki model.
+     *
+     * @details For cast-iron shoes (UIC standard):
+     *   mu(v) = 0.6 * (v_kmh + 100) / (5 * v_kmh + 100)
+     * For composition shoes:
+     *   mu(v) = 0.36 * (v_kmh + 150) / (2 * v_kmh + 150)
+     *
+     * @param speed_mps  Train speed in m/s.
+     * @param shoeType   Type of brake shoe (default: castIron).
+     * @returns The brake shoe friction coefficient (dimensionless).
+     */
+    double getBrakeShoeFriction(double speed_mps,
+                                TrainTypes::BrakeShoeType shoeType =
+                                    TrainTypes::BrakeShoeType::castIron);
 }
 
 
