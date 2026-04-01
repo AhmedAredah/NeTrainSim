@@ -170,7 +170,7 @@ if(BUILD_SERVER)
     elseif(UNIX)
         # Linux-specific paths
         set(CONTAINER_SEARCH_PATHS "/usr/local/lib/cmake/Container" CACHE PATH "Default path to container's library on Linux")
-        set(RABBITMQ_CMAKE_DIR "/usr/local/lib/cmake/rabbitmq-c" CACHE PATH "Default path to RabbitMQ-C library on Linux")
+        set(RABBITMQ_CMAKE_DIR "/usr/local/${CMAKE_BUILD_TYPE}/lib/cmake/rabbitmq-c" CACHE PATH "Default path to RabbitMQ-C library on Linux")
     else()
         message(FATAL_ERROR "Unsupported platform. Please set paths for CONTAINER_CMAKE_DIR and RABBITMQ_CMAKE_DIR manually.")
     endif()
