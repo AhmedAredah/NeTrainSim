@@ -151,7 +151,7 @@ if(BUILD_GUI)
     elseif(APPLE)
         set(KDREPORTS_DIR "/usr/local/KDAB/KDReports-2.3.95/lib/cmake/KDReports-qt6" CACHE PATH "Path to KDReports CMake directory")
     elseif(UNIX)
-        set(KDREPORTS_DIR "/usr/local/KDAB/KDReports-2.3.95/lib/cmake/KDReports-qt6" CACHE PATH "Path to KDReports CMake directory")
+        set(KDREPORTS_DIR "/usr/local/${CMAKE_BUILD_TYPE}/lib/cmake/KDReports-qt6" CACHE PATH "Path to KDReports CMake directory")
     endif()
 
     # Use the KDReports CMake package
