@@ -66,7 +66,7 @@ Train::Train(
                                      Map<int, double>()));
     Train::NumberOfTrainsInSimulator++;
     this->T_s = this->operatorReactionTime
-                + (this->totalLength / this->speedOfSound);
+                + (this->totalLength / this->brakePipePropagationSpeed);
 
     for (auto &car : this->cars)
     {
@@ -179,7 +179,7 @@ double Train::getDesiredDeceleration(double speed)
         totalBrakingForce += vehicle->getBrakingForce(speed);
     }
     double d_physical = totalBrakingForce / this->totalMass;
-    double d = DefaultBrakingComfortFactor * d_physical;
+    double d = DefaultServiceBrakingFactor * d_physical;
     double d_max = this->coefficientOfFriction * this->g;
     return std::max(MinDesiredDeceleration, std::min(d, d_max));
 }

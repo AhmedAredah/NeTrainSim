@@ -55,10 +55,10 @@ private:
     static unsigned int NumberOfTrainsInSimulator;
     /** (Immutable) minimum desired deceleration to prevent infinite safe gaps (m/s^2) */
     static constexpr double MinDesiredDeceleration = 0.05;
-    /** Fraction of maximum braking capability used as desired deceleration.
-     *  Scales Karwatzki physical maximum to a comfortable braking rate
-     *  for the car-following safe gap calculation. */
-    static constexpr double DefaultBrakingComfortFactor = 0.15;
+    /** Fraction of emergency braking used for normal service braking.
+     *  0.5 = 50% of max brake force (Karwatzki physical maximum).
+     *  Typical: 0.35 heavy haul, 0.5 freight, 0.65 passenger. */
+    static constexpr double DefaultServiceBrakingFactor = 0.5;
     /** (Immutable) the default reaction time of the train operator */
     static constexpr double DefaultOperatorReactionTime = 1.0;
     /** (Immutable) the default switch of the train behaviour if no energy source */
@@ -75,10 +75,10 @@ private:
 public:
 
     /**
-     * (Immutable) the speed of sound in m / s, this is an approximation of the brackes back
-     * propagation
+     * (Immutable) brake pipe pressure wave propagation speed in m/s.
+     * Measured ~250 m/s for service braking on freight (Qiao 2018).
      */
-    static constexpr double speedOfSound = 343.0;
+    static constexpr double brakePipePropagationSpeed = 250.0;
     /** (Immutable) gravitational acceleration */
     const double g = 9.8066;
     /** the perception reaction time of the train operator. */
