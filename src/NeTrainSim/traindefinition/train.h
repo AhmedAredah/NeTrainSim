@@ -55,6 +55,10 @@ private:
     static unsigned int NumberOfTrainsInSimulator;
     /** (Immutable) minimum desired deceleration to prevent infinite safe gaps (m/s^2) */
     static constexpr double MinDesiredDeceleration = 0.05;
+    /** Fraction of maximum braking capability used as desired deceleration.
+     *  Scales Karwatzki physical maximum to a comfortable braking rate
+     *  for the car-following safe gap calculation. */
+    static constexpr double DefaultBrakingComfortFactor = 0.15;
     /** (Immutable) the default reaction time of the train operator */
     static constexpr double DefaultOperatorReactionTime = 1.0;
     /** (Immutable) the default switch of the train behaviour if no energy source */
@@ -342,9 +346,11 @@ public:
     /**
      * @brief Gets the speed-dependent desired deceleration rate.
      *
-     * @details Sums per-vehicle braking forces (Karwatzki model) and divides
-     * by total train mass. Each vehicle uses its own brakedWeightRatio and
-     * trackGrade.
+     * @details Computes comfortable braking deceleration for the
+     * car-following safe gap calculation. Sums per-vehicle shoe braking
+     * forces (Karwatzki model), divides by total train mass, then scales
+     * by DefaultBrakingComfortFactor to convert from physical maximum
+     * to a desired comfortable rate.
      *
      * @param speed The current train speed in m/s.
      * @returns The desired deceleration in m/s^2.

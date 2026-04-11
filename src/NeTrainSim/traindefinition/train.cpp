@@ -178,7 +178,8 @@ double Train::getDesiredDeceleration(double speed)
     {
         totalBrakingForce += vehicle->getBrakingForce(speed);
     }
-    double d = totalBrakingForce / this->totalMass;
+    double d_physical = totalBrakingForce / this->totalMass;
+    double d = DefaultBrakingComfortFactor * d_physical;
     double d_max = this->coefficientOfFriction * this->g;
     return std::max(MinDesiredDeceleration, std::min(d, d_max));
 }
