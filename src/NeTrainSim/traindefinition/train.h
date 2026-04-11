@@ -53,8 +53,12 @@ class NETRAINSIMCORE_EXPORT Train : public QObject {
 private:
     /** Holds the number of trains in the simulator. */
     static unsigned int NumberOfTrainsInSimulator;
-    /** (Immutable) the default desired deceleration rate */
-    static constexpr double DefaultDesiredDecelerationRate = 0.2;
+    /** (Immutable) minimum desired deceleration to prevent infinite safe gaps (m/s^2) */
+    static constexpr double MinDesiredDeceleration = 0.05;
+    /** Fraction of emergency braking used for normal service braking.
+     *  0.5 = 50% of max brake force (Karwatzki physical maximum).
+     *  Typical: 0.35 heavy haul, 0.5 freight, 0.65 passenger. */
+    static constexpr double DefaultServiceBrakingFactor = 0.5;
     /** (Immutable) the default reaction time of the train operator */
     static constexpr double DefaultOperatorReactionTime = 1.0;
     /** (Immutable) the default switch of the train behaviour if no energy source */
@@ -71,14 +75,12 @@ private:
 public:
 
     /**
-     * (Immutable) the speed of sound in m / s, this is an approximation of the brackes back
-     * propagation
+     * (Immutable) brake pipe pressure wave propagation speed in m/s.
+     * Measured ~250 m/s for service braking on freight (Qiao 2018).
      */
-    static constexpr double speedOfSound = 343.0;
+    static constexpr double brakePipePropagationSpeed = 250.0;
     /** (Immutable) gravitational acceleration */
     const double g = 9.8066;
-    /** The desired decceleration value */
-    double d_des;
     /** the perception reaction time of the train operator. */
     double operatorReactionTime;
     /** Total length of the train */
@@ -273,15 +275,12 @@ public:
      * @param 	locomotives				   	The locomotives.
      * @param 	cars					   	The cars.
      * @param 	optimize				   	True to optimize.
-     * @param 	desiredDecelerationRate_mPs	(Optional) The desired deceleration rate m ps.
      * @param 	operatorReactionTime_s	   	(Optional) The operator reaction time s.
      * @param 	stopIfNoEnergy			   	(Optional) True to stop if no energy.
-     * @param 	isRunnigOffGrid			   	(Optional) True if is runnig off grid, false if not.
      * @param 	maxAllowedJerk_mPcs		   	(Optional) The maximum allowed jerk m pcs.
      */
     Train(int simulatorID, string id, Vector<int> trainPath, double trainStartTime_sec, double frictionCoeff,
           Vector<std::shared_ptr<Locomotive>> locomotives, Vector<std::shared_ptr<Car>> cars, bool optimize,
-          double desiredDecelerationRate_mPs = DefaultDesiredDecelerationRate,
           double operatorReactionTime_s = DefaultOperatorReactionTime,
           bool stopIfNoEnergy = DefaultStopIfNoEnergy,
           double maxAllowedJerk_mPcs = DefaultMaxAllowedJerk,
@@ -343,6 +342,20 @@ public:
      * @returns	The minimum following train gap.
      */
     double getMinFollowingTrainGap();
+
+    /**
+     * @brief Gets the speed-dependent desired deceleration rate.
+     *
+     * @details Computes comfortable braking deceleration for the
+     * car-following safe gap calculation. Sums per-vehicle shoe braking
+     * forces (Karwatzki model), divides by total train mass, then scales
+     * by DefaultBrakingComfortFactor to convert from physical maximum
+     * to a desired comfortable rate.
+     *
+     * @param speed The current train speed in m/s.
+     * @returns The desired deceleration in m/s^2.
+     */
+    double getDesiredDeceleration(double speed);
 
     /**
      * @brief set the current links the train is spanning

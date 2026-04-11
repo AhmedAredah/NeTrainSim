@@ -6,6 +6,12 @@ double TrainComponent::getResistance(double trainSpeed) {
 	return 0.0;
 }
 
+double TrainComponent::getBrakingForce(double trainSpeed) {
+    double muShoe = EC::getBrakeShoeFriction(trainSpeed);
+    double weightKg = this->currentWeight * 1000.0;
+    return this->brakedWeightRatio * weightKg * EC::g * muShoe;
+}
+
 void TrainComponent::resetTimeStepConsumptions() {
     // reset the energy consumption for the time step.
 	this->energyConsumed = 0.0;

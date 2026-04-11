@@ -151,7 +151,7 @@ if(BUILD_GUI)
     elseif(APPLE)
         set(KDREPORTS_DIR "/usr/local/KDAB/KDReports-2.3.95/lib/cmake/KDReports-qt6" CACHE PATH "Path to KDReports CMake directory")
     elseif(UNIX)
-        set(KDREPORTS_DIR "/usr/local/KDAB/KDReports-2.3.95/lib/cmake/KDReports-qt6" CACHE PATH "Path to KDReports CMake directory")
+        set(KDREPORTS_DIR "/usr/local/${CMAKE_BUILD_TYPE}/lib/cmake/KDReports-qt6" CACHE PATH "Path to KDReports CMake directory")
     endif()
 
     # Use the KDReports CMake package
@@ -170,7 +170,7 @@ if(BUILD_SERVER)
     elseif(UNIX)
         # Linux-specific paths
         set(CONTAINER_SEARCH_PATHS "/usr/local/lib/cmake/Container" CACHE PATH "Default path to container's library on Linux")
-        set(RABBITMQ_CMAKE_DIR "/usr/local/lib/cmake/rabbitmq-c" CACHE PATH "Default path to RabbitMQ-C library on Linux")
+        set(RABBITMQ_CMAKE_DIR "/usr/local/${CMAKE_BUILD_TYPE}/lib/cmake/rabbitmq-c" CACHE PATH "Default path to RabbitMQ-C library on Linux")
     else()
         message(FATAL_ERROR "Unsupported platform. Please set paths for CONTAINER_CMAKE_DIR and RABBITMQ_CMAKE_DIR manually.")
     endif()

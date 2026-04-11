@@ -301,6 +301,34 @@ namespace EC {
      * @returns The fuel conversion factor.
      */
     double getFuelConversionFactor(TrainTypes::CarType carType);
+
+    /** (Immutable) gravitational acceleration (m/s^2) */
+    static constexpr double g = 9.8066;
+    /** (Immutable) default braked weight ratio for locomotives */
+    static constexpr double DefaultLocomotiveBrakedWeightRatio = 0.9;
+    /** (Immutable) default braked weight ratio for cargo cars */
+    static constexpr double DefaultCarBrakedWeightRatio_Cargo = 0.6;
+    /** (Immutable) default braked weight ratio for tender cars */
+    static constexpr double DefaultCarBrakedWeightRatio_Tender = 0.7;
+
+    /** (Immutable) the speed below which dynamic braking fades to zero (km/h) */
+    static constexpr double DynamicBrakingFadeSpeed_kmh = 15.0;
+
+    /**
+     * Gets the brake shoe friction coefficient using the Karwatzki model.
+     *
+     * @details For cast-iron shoes (UIC standard):
+     *   mu(v) = 0.6 * (v_kmh + 100) / (5 * v_kmh + 100)
+     * For composition shoes:
+     *   mu(v) = 0.36 * (v_kmh + 150) / (2 * v_kmh + 150)
+     *
+     * @param speed_mps  Train speed in m/s.
+     * @param shoeType   Type of brake shoe (default: castIron).
+     * @returns The brake shoe friction coefficient (dimensionless).
+     */
+    double getBrakeShoeFriction(double speed_mps,
+                                TrainTypes::BrakeShoeType shoeType =
+                                    TrainTypes::BrakeShoeType::castIron);
 }
 
 

@@ -159,4 +159,16 @@ namespace EC {
         return fuelConversionFactor_carTypes[carType];
     }
 
+    double getBrakeShoeFriction(double speed_mps,
+                                TrainTypes::BrakeShoeType shoeType) {
+        double v_kmh = speed_mps * 3.6;
+        switch (shoeType) {
+        case TrainTypes::BrakeShoeType::composition:
+            return 0.36 * (v_kmh + 150.0) / (2.0 * v_kmh + 150.0);
+        case TrainTypes::BrakeShoeType::castIron:
+        default:
+            return 0.6 * (v_kmh + 100.0) / (5.0 * v_kmh + 100.0);
+        }
+    }
+
 }

@@ -260,22 +260,23 @@ std::shared_ptr<Train> TrainsList::generateTrain(
             trainID.fetch_add(1, std::memory_order_acq_rel);
 
         // create a new train and add it to the trains list
-        return std::make_shared<Train>(
+        auto train = std::make_shared<Train>(
             currentID,
             std::any_cast<std::string>(
-                trainRecord["UserID"]), // user id
+                trainRecord["UserID"]),
             std::any_cast<Vector<int>>(
-                trainRecord["TrainPathOnNodeIDs"]), // path
+                trainRecord["TrainPathOnNodeIDs"]),
             std::any_cast<double>(
-                trainRecord["LoadTime"]), // time
+                trainRecord["LoadTime"]),
             std::any_cast<double>(
-                trainRecord["FrictionCoef"]), // friction
-                                              // coef
-            locomotives,                      // locomotives
-            cars,                             // cars
+                trainRecord["FrictionCoef"]),
+            locomotives,
+            cars,
             std::any_cast<bool>(
-                trainRecord["Optimize"]) // no optimization
+                trainRecord["Optimize"])
         );
+
+        return train;
     }
     catch (std::exception &e)
     {
