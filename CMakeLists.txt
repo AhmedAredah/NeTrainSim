@@ -20,7 +20,7 @@ endif()
 
 # Define the project name (NeTrainSim) and
 # the programming language used (CXX for C++)
-set(NeTrainSim_VERSION "0.1.3" CACHE STRING "Project version" FORCE)
+set(NeTrainSim_VERSION "0.1.4" CACHE STRING "Project version" FORCE)
 set(NETRAINSIM_NAME "NeTrainSim" CACHE STRING "Project name" FORCE)
 set(NETRAINSIM_VENDOR "(C) 2022-2023 Virginia Tech Transportation Institute - Center for Sustainable Mobility." CACHE STRING "Project vendor" FORCE)
 # Get the current date and time
