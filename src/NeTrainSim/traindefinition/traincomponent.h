@@ -98,10 +98,13 @@ public:
 	 * \brief Gets the braking force for this vehicle at the given speed.
 	 *
 	 * \details Computes per-vehicle braking force using the Karwatzki model:
-	 *   F = brakedWeightRatio * weight * g * mu_shoe(v) + weight * g * grade
+	 *   F = brakedWeightRatio * weight * g * mu_shoe(v)
+	 *
+	 * Grade is excluded because it causes discontinuous jumps when vehicles
+	 * cross link boundaries and is already captured in the resistance model.
 	 *
 	 * @param trainSpeed The current train speed in m/s.
-	 * @returns The braking force in Newtons.
+	 * @returns The braking force in Newtons (shoe friction only).
 	 */
 	virtual double getBrakingForce(double trainSpeed);
 

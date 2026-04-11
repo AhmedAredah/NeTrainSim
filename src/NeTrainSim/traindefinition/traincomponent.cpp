@@ -9,9 +9,7 @@ double TrainComponent::getResistance(double trainSpeed) {
 double TrainComponent::getBrakingForce(double trainSpeed) {
     double muShoe = EC::getBrakeShoeFriction(trainSpeed);
     double weightKg = this->currentWeight * 1000.0;
-    double F_brake = this->brakedWeightRatio * weightKg * EC::g * muShoe;
-    double F_grade = weightKg * EC::g * this->trackGrade;
-    return F_brake + F_grade;
+    return this->brakedWeightRatio * weightKg * EC::g * muShoe;
 }
 
 void TrainComponent::resetTimeStepConsumptions() {
